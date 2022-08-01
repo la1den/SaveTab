@@ -1,7 +1,25 @@
-async function queryTabs(tab) {
-    let tabs = await chrome.tabs.query({ });
-    for (const t of tabs) {
-        console.log(t.url);
-    }
+function onTabLoaded(tabId) {
+  return new Promise(resolve => {
+    chrome.tabs.onUpdated.addListener(function onUpdated(id, change) {
+      if (id === tabId && change.status === 'complete') {
+        chrome.tabs.onUpdated.removeListener(onUpdated);
+        resolve();
+      }
+    });
+  });
 }
-chrome.action.onClicked.addListener(queryTabs);
+
+async function doit(tab) {
+    let tabs = await chrome.tabs.query({ });
+    const newtab = await chrome.tabs.create({
+      url: 'data.html',
+    });
+    await onTabLoaded(newtab.id);
+    await chrome.tabs.sendMessage(newtab.id, {
+        action: 'tabsdata',
+        data: tabs,
+    });
+
+}
+
+chrome.action.onClicked.addListener(doit);
