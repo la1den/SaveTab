@@ -1,2 +1,3 @@
+# SaveTab
 ### Feature
-Save the tabs of current windows to a new tab.
+Save the tab's url of current windows to a new tab.
